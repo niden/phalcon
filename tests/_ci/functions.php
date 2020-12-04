@@ -75,10 +75,7 @@ if (!function_exists('defineFromEnv')) {
             return;
         }
 
-        define(
-            $name,
-            env($name)
-        );
+        define($name, env($name));
     }
 }
 

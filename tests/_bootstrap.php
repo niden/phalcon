@@ -3,16 +3,22 @@
 declare(strict_types=1);
 
 $root = dirname(realpath(__DIR__) . DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-//define('PROJECT_PATH', $root);
 
 require_once $root . 'tests/_ci/functions.php';
 
-if (!file_exists(cacheDir())) {
-    mkdir(cacheDir());
-}
+// Folders
+$folders = [
+    cacheDir(),
+    logsDir(),
+    outputDir('image'),
+    outputDir('image/imagick'),
+    outputDir('image/gd'),
+];
 
-if (!file_exists(logsDir())) {
-    mkdir(logsDir());
+foreach ($folders as $folder) {
+    if (true !== file_exists($folder)) {
+        mkdir($folder);
+    }
 }
 
 loadDefined();

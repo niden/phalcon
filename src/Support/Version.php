@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace Phalcon\Version;
+namespace Phalcon\Support;
 
 /**
  * This class allows to get the installed version of the framework

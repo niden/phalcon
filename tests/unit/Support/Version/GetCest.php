@@ -11,12 +11,11 @@
 
 declare(strict_types=1);
 
-namespace Phalcon\Tests\Unit\Version;
+namespace Phalcon\Tests\Unit\Support\Version;
 
-use Codeception\Stub;
 use Phalcon\Tests\Fixtures\Traits\VersionTrait;
 use Phalcon\Tests\Fixtures\VersionFixture;
-use Phalcon\Version\Version;
+use Phalcon\Support\Version;
 use UnitTester;
 
 use function is_string;
@@ -24,21 +23,21 @@ use function is_string;
 /**
  * Class GetCest
  *
- * @package Phalcon\Tests\Unit\Version
+ * @package Phalcon\Tests\Unit\Support\Version
  */
 class GetCest
 {
     use VersionTrait;
 
     /**
-     * Tests Phalcon\Version :: get()
+     * Tests Phalcon\Support\Version :: get()
      *
      * @param UnitTester $I
      *
      * @author Phalcon Team <team@phalcon.io>
      * @since  2020-09-09
      */
-    public function versionGet(UnitTester $I)
+    public function supportVersionGet(UnitTester $I)
     {
         $I->wantToTest('Version - get()');
 
@@ -54,7 +53,7 @@ class GetCest
      * @author Phalcon Team <team@phalcon.io>
      * @since  2020-09-09
      */
-    public function versionGetIdToGet(UnitTester $I)
+    public function supportVersionGetIdToGet(UnitTester $I)
     {
         $I->wantToTest('Version - getId() to get()');
 
@@ -86,7 +85,7 @@ class GetCest
      * @author Phalcon Team <team@phalcon.io>
      * @since  2020-09-09
      */
-    public function versionGetWithSpecialVersion(UnitTester $I)
+    public function supportVersionGetWithSpecialVersion(UnitTester $I)
     {
         $I->wantToTest('Version - get() with special version');
 

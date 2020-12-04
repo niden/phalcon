@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Phalcon\Tests\Unit\Support\Debug;
 
-use Phalcon\Support\Debug\Debug;
+use Phalcon\Support\Debug;
 use Phalcon\Tests\Fixtures\Traits\DiTrait;
-use Phalcon\Version\Version;
+use Phalcon\Support\Version;
 use UnitTester;
 
 /**

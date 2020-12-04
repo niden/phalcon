@@ -11,27 +11,27 @@
 
 declare(strict_types=1);
 
-namespace Phalcon\Tests\Unit\Version;
+namespace Phalcon\Tests\Unit\Support\Version;
 
-use Phalcon\Version\Version;
+use Phalcon\Support\Version;
 use UnitTester;
 
 /**
  * Class ConstantsCest
  *
- * @package Phalcon\Tests\Unit\Version
+ * @package Phalcon\Tests\Unit\Support\Version
  */
 class ConstantsCest
 {
     /**
-     * Tests Phalcon\Version :: Constants
+     * Tests Phalcon\Support\Version :: Constants
      *
      * @param UnitTester $I
      *
      * @author Phalcon Team <team@phalcon.io>
      * @since  2020-09-09
      */
-    public function versionConstants(UnitTester $I)
+    public function supportVersionConstants(UnitTester $I)
     {
         $I->wantToTest('Version - constants');
 

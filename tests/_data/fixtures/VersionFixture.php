@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Phalcon\Tests\Fixtures;
 
-use Phalcon\Version\Version;
+use Phalcon\Support\Version;
 
 class VersionFixture extends Version
 {

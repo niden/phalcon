@@ -11,30 +11,30 @@
 
 declare(strict_types=1);
 
-namespace Phalcon\Tests\Unit\Version;
+namespace Phalcon\Tests\Unit\Support\Version;
 
 use Phalcon\Tests\Fixtures\Traits\VersionTrait;
-use Phalcon\Version\Version;
+use Phalcon\Support\Version;
 use UnitTester;
 
 /**
  * Class GetPartCest
  *
- * @package Phalcon\Tests\Unit\Version
+ * @package Phalcon\Tests\Unit\Support\Version
  */
 class GetPartCest
 {
     use VersionTrait;
 
     /**
-     * Tests Phalcon\Version :: getPart()
+     * Tests Phalcon\Support\Version :: getPart()
      *
      * @param UnitTester $I
      *
      * @author Phalcon Team <team@phalcon.io>
      * @since  2020-09-09
      */
-    public function versionGetPart(UnitTester $I)
+    public function supportVersionGetPart(UnitTester $I)
     {
         $I->wantToTest('Version - getPart()');
 

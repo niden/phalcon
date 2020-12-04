@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace Phalcon\Tests\Unit\Version;
+namespace Phalcon\Tests\Unit\Support\Version;
 
 use Phalcon\Tests\Fixtures\Traits\VersionTrait;
-use Phalcon\Version\Version;
+use Phalcon\Support\Version;
 use UnitTester;
 
 use function is_string;
@@ -22,21 +22,21 @@ use function is_string;
 /**
  * Class GetIdCest
  *
- * @package Phalcon\Tests\Unit\Version
+ * @package Phalcon\Tests\Unit\Support\Version
  */
 class GetIdCest
 {
     use VersionTrait;
 
     /**
-     * Tests Phalcon\Version :: getId()
+     * Tests Phalcon\Support\Version :: getId()
      *
      * @param UnitTester $I
      *
      * @author Phalcon Team <team@phalcon.io>
      * @since  2020-09-09
      */
-    public function versionGetId(UnitTester $I)
+    public function supportVersionGetId(UnitTester $I)
     {
         $I->wantToTest('Version - getId()');
 
@@ -51,7 +51,7 @@ class GetIdCest
      * @author Phalcon Team <team@phalcon.io>
      * @since  2020-09-09
      */
-    public function versionGetToGetId(UnitTester $I)
+    public function supportVersionGetToGetId(UnitTester $I)
     {
         $I->wantToTest('Version - get() to getId()');
 

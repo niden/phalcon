@@ -18,14 +18,14 @@ use Phalcon\Assets\Asset\Css;
 use UnitTester;
 
 /**
- * Class SetAttributesCest
+ * Class GetSetAttributesCest
  *
  * @package Phalcon\Tests\Unit\Assets\Asset\Css
  */
-class SetAttributesCest
+class GetSetAttributesCest
 {
     /**
-     * Tests Phalcon\Assets\Asset\Css :: setAttributes()
+     * Tests Phalcon\Assets\Asset\Css :: getAttributes()/setAttributes()
      *
      * @dataProvider provider
      *
@@ -35,7 +35,7 @@ class SetAttributesCest
      * @author       Phalcon Team <team@phalcon.io>
      * @since        2020-09-09
      */
-    public function assetsAssetCssSetAttributes(UnitTester $I, Example $example)
+    public function assetsAssetCssGetSetAttributes(UnitTester $I, Example $example)
     {
         $I->wantToTest('Assets\Asset\Css - setAttributes()');
 

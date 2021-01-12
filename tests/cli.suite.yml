@@ -1,7 +1,9 @@
 actor: CliTester
+
 modules:
+  config:
   enabled:
     - Asserts
     - Cli
-    - \Helper\Cli
-    - \Helper\Unit
+    - Helper\Cli
+    - Helper\Unit

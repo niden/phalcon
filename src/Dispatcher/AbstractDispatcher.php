@@ -22,6 +22,7 @@ use Phalcon\Mvc\Model\BinderInterface;
 use Phalcon\Support\Str\Traits\CamelizeTrait;
 use Phalcon\Support\Str\Traits\EndsWithTrait;
 use Psr\SimpleCache\CacheInterface;
+
 use function call_user_func_array;
 use function class_exists;
 use function is_array;
@@ -63,8 +64,7 @@ use function spl_object_hash;
  * @property string|null          $previousNamespaceName
  * @property mixed|null           $returnedValue
  */
-abstract class AbstractDispatcher
-    implements DispatcherInterface, EventsAwareInterface, InjectionAwareInterface
+abstract class AbstractDispatcher implements DispatcherInterface, EventsAwareInterface, InjectionAwareInterface
 {
     use CamelizeTrait;
     use EndsWithTrait;
@@ -216,7 +216,7 @@ abstract class AbstractDispatcher
      *                      occurred and the operation was stopped by returning
      *                      <tt>false</tt> in the exception handler.
      *
-     * @throws \Exception if any uncaught or unhandled exception occurs during
+     * @throws BaseException if any uncaught or unhandled exception occurs during
      *                    the dispatcher process.
      */
     public function dispatch()
@@ -234,7 +234,8 @@ abstract class AbstractDispatcher
             try {
                 // Calling beforeDispatchLoop event
                 // Note: Allow user to forward in the beforeDispatchLoop.
-                if (false === $this->fireEvent('dispatch:beforeDispatchLoop') &&
+                if (
+                    false === $this->fireEvent('dispatch:beforeDispatchLoop') &&
                     false !== $this->finished
                 ) {
                     return false;

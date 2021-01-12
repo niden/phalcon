@@ -19,10 +19,8 @@ use Phalcon\Cli\Dispatcher;
 use Phalcon\Cli\Router;
 use Phalcon\Di\FactoryDefault\Cli;
 use Phalcon\Escaper;
-use Phalcon\Filter;
 use Phalcon\Mvc\Model\MetaData\Memory;
 use Phalcon\Mvc\Model\Transaction\Manager;
-use Phalcon\Security;
 
 class ConstructCest
 {

@@ -43,5 +43,5 @@ class Camelize
     public function __invoke(string $text, string $delimiters = '_-'): string
     {
         return $this->toCamelize($text, $delimiters);
-   }
+    }
 }

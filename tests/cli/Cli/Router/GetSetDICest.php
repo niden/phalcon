@@ -15,7 +15,6 @@ namespace Phalcon\Tests\Cli\Cli\Router;
 
 use CliTester;
 use Phalcon\Cli\Router;
-use Phalcon\Di;
 
 class GetSetDICest
 {

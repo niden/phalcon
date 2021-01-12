@@ -74,8 +74,8 @@ class Dispatcher extends AbstractDispatcher implements DispatcherInterface
      * Calls the action method.
      */
     public function callActionMethod(
-        $handler, 
-        string $actionMethod, 
+        $handler,
+        string $actionMethod,
         array $params = []
     ) {
         // This is to make sure that the parameters are zero-indexed and

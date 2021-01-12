@@ -13,6 +13,17 @@ declare(strict_types=1);
 
 namespace Phalcon\Cli\Router;
 
+use Phalcon\Support\Str\Traits\StartsWithTrait;
+
+use function array_flip;
+use function array_merge;
+use function explode;
+use function is_array;
+use function is_string;
+use function str_replace;
+use function str_split;
+use function substr;
+
 /**
  * This class represents every route added to the router
  *
@@ -36,6 +47,8 @@ namespace Phalcon\Cli\Router;
  */
 class Route implements RouteInterface
 {
+    use StartsWithTrait;
+
     public const DEFAULT_DELIMITER = ' ';
 
     protected $beforeMatch = null;
@@ -98,21 +111,16 @@ class Route implements RouteInterface
      */
     public function __construct(string $pattern, $paths = null)
     {
-//        var routeId, uniqueId;
-//
-//        // Get the delimiter from the static member delimiterPath
-//        let this->delimiter = self::delimiterPath;
-//
-//        // Configure the route (extract parameters, paths, etc)
-//        this->reConfigure(pattern, paths);
-//
-//        // Get the unique Id from the static member uniqueId
-//        let uniqueId = self::uniqueId;
-//
-//        // TODO: Add a function that increase static members
-//        let routeId        = uniqueId,
-//            this->routeId  = routeId,
-//            self::uniqueId = uniqueId + 1;
+        // Get the delimiter from the static member delimiterPath
+        $this->delimiter = self::$delimiterPath;
+
+        // Configure the route (extract parameters, paths, etc)
+        $this->reConfigure($pattern, $paths);
+
+        // Get the unique Id from the static member uniqueId
+        $this->routeId = self::$uniqueId;
+
+        self::$uniqueId++;
     }
 
     /**
@@ -134,78 +142,44 @@ class Route implements RouteInterface
     /**
      * Replaces placeholders from pattern returning a valid PCRE regular
      * expression
+     *
+     * @param string $pattern
+     *
+     * @return string
      */
     public function compilePattern(string $pattern): string
     {
-//        // If a pattern contains ':', maybe there are placeholders to replace
-//        if memstr(pattern, ":") {
-//
-//            // This is a pattern for valid identifiers
-//            let idPattern = this->delimiter . "([a-zA-Z0-9\\_\\-]+)";
-//
-//            // Replace the delimiter part
-//            if memstr(pattern, ":delimiter") {
-//                let pattern = str_replace(
-//                    ":delimiter",
-//                    this->delimiter,
-//                    pattern
-//                );
-//            }
-//
-//            // Replace the module part
-//            let part = this->delimiter . ":module";
-//            if memstr(pattern, part) {
-//                let pattern = str_replace(part, idPattern, pattern);
-//            }
-//
-//            // Replace the task placeholder
-//            let part = this->delimiter . ":task";
-//            if memstr(pattern, part) {
-//                let pattern = str_replace(part, idPattern, pattern);
-//            }
-//
-//            // Replace the namespace placeholder
-//            let part = this->delimiter . ":namespace";
-//            if memstr(pattern, part) {
-//                let pattern = str_replace(part, idPattern, pattern);
-//            }
-//
-//            // Replace the action placeholder
-//            let part = this->delimiter . ":action";
-//            if memstr(pattern, part) {
-//                let pattern = str_replace(part, idPattern, pattern);
-//            }
-//
-//            // Replace the params placeholder
-//            let part = this->delimiter . ":params";
-//            if memstr(pattern, part) {
-//                let pattern = str_replace(
-//                    part,
-//                    "(" . this->delimiter . ".*)*",
-//                    pattern
-//                );
-//            }
-//
-//            // Replace the int placeholder
-//            let part = this->delimiter . ":int";
-//            if memstr(pattern, part) {
-//                let pattern = str_replace(
-//                    part,
-//                    this->delimiter . "([0-9]+)",
-//                    pattern
-//                );
-//            }
-//        }
-//
-//        /**
-//         * Check if the pattern has parentheses or square brackets in order to
-//         * add the regex delimiters
-//         */
-//        if memstr(pattern, "(") || memstr(pattern, "[") {
-//            return "#^" . pattern . "$#";
-//        }
-//
-//        return pattern;
+        // If a pattern contains ':', maybe there are placeholders to replace
+        if (false !== mb_strpos($pattern, ':')) {
+            // This is a pattern for valid identifiers
+            $idPattern = $this->delimiter . "([a-zA-Z0-9\\_\\-]+)";
+
+            $map = [
+                ':delimiter' => $this->delimiter,
+                ':module'    => $idPattern,
+                ':task'      => $idPattern,
+                ':namespace' => $idPattern,
+                ':action'    => $idPattern,
+                ':params'    => '(' . $this->delimiter . '.*)*',
+                ':int'       => $this->delimiter . '([0-9]+)',
+            ];
+
+            foreach ($map as $part => $replace) {
+                if (false !== mb_strpos($pattern, $part)) {
+                    $pattern = str_replace($part, $replace, $pattern);
+                }
+            }
+        }
+
+        /**
+         * Check if the pattern has parentheses or square brackets in order to
+         * add the regex delimiters
+         */
+        if (false !== mb_strpos($pattern, '(') || false !== mb_strpos($pattern, '[')) {
+            return '#^' . $pattern . '$#';
+        }
+
+        return $pattern;
     }
 
     /**
@@ -223,6 +197,8 @@ class Route implements RouteInterface
 
     /**
      * Set the routing delimiter
+     *
+     * @param string|null $delimiter
      */
     public static function delimiter(string $delimiter = null): void
     {
@@ -238,131 +214,155 @@ class Route implements RouteInterface
      */
     public function extractNamedParams(string $pattern)
     {
-//        char ch;
-//        var tmp;
-//        array matches;
-//        bool notValid;
-//        int cursor, cursorVar, marker, bracketCount = 0, parenthesesCount = 0, foundPattern = 0;
-//        int intermediate = 0, numberMatches = 0;
-//        string route, item, variable, regexp;
-//
-//        if strlen(pattern) === 0 {
-//            return false;
-//        }
-//
-//        let matches = [],
-//            route = "";
-//
-//        for cursor, ch in pattern {
-//            if parenthesesCount == 0 {
-//                if ch == '{' {
-//                    if bracketCount == 0 {
-//                        let marker = cursor + 1,
-//                            intermediate = 0,
-//                            notValid = false;
-//                    }
-//
-//                    let bracketCount++;
-//                } elseif ch == '}' {
-//                    let bracketCount--;
-//
-//                    if intermediate > 0 {
-//                        if bracketCount == 0 {
-//                            let numberMatches++,
-//                                variable = null,
-//                                regexp = null,
-//                                item = (string) substr(pattern, marker, cursor - marker);
-//
-//                            for cursorVar, ch in item {
-//                                if ch == '\0' {
-//                                    break;
-//                                }
-//
-//                                if cursorVar == 0 && !((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')) {
-//                                    let notValid = true;
-//
-//                                    break;
-//                                }
-//
-//                                if (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <='9') || ch == '-' || ch == '_' || ch ==  ':' {
-//                                    if ch == ':' {
-//                                        let variable = (string) substr(item, 0, cursorVar),
-//                                            regexp = (string) substr(item, cursorVar + 1);
-//
-//                                        break;
-//                                    }
-//                                } else {
-//                                    let notValid = true;
-//
-//                                    break;
-//                                }
-//                            }
-//
-//                            if !notValid {
-//                                let tmp = numberMatches;
-//
-//                                if variable && regexp {
-//                                    let foundPattern = 0;
-//
-//                                    for ch in regexp {
-//                                        if ch == '\0' {
-//                                            break;
-//                                        }
-//
-//                                        if !foundPattern {
-//                                            if ch == '(' {
-//                                                let foundPattern = 1;
-//                                            }
-//                                        } else {
-//                                            if ch == ')' {
-//                                                let foundPattern = 2;
-//
-//                                                break;
-//                                            }
-//                                        }
-//                                     }
-//
-//                                    if foundPattern != 2 {
-//                                        let route .= "(" . regexp . ")";
-//                                    } else {
-//                                        let route .= regexp;
-//                                    }
-//
-//                                    let matches[variable] = tmp;
-//                                } else {
-//                                    let route .= "([^" . this->delimiter . "]*)",
-//                                        matches[item] = tmp;
-//                                }
-//                            } else {
-//                                let route .= "{" . item . "}";
-//                            }
-//
-//                            continue;
-//                        }
-//                    }
-//                }
-//            }
-//
-//            if bracketCount == 0 {
-//                if ch == '(' {
-//                    let parenthesesCount++;
-//                } elseif ch == ')' {
-//                    let parenthesesCount--;
-//
-//                    if parenthesesCount == 0 {
-//                        let numberMatches++;
-//                    }
-//                }
-//            }
-//
-//            if bracketCount > 0 {
-//                let intermediate++;
-//            } else {
-//                let route .= ch;
-//            }
-//        }
-//
-//        return [route, matches];
+        $bracketCount     = 0;
+        $parenthesesCount = 0;
+        $intermediate     = 0;
+        $numberMatches    = 0;
+        $marker           = 0;
+        $matches          = [];
+        $route            = '';
+        $notValid         = false;
+
+        if (0 === mb_strlen($pattern)) {
+            return false;
+        }
+
+        $patternArray = str_split($pattern);
+        foreach ($patternArray as $cursor => $character) {
+            if (0 === $parenthesesCount) {
+                if ('{' === $character) {
+                    if (0 === $bracketCount) {
+                        $marker       = $cursor + 1;
+                        $intermediate = 0;
+                        $notValid     = false;
+                    }
+
+                    $bracketCount++;
+                } elseif ('}' === $character) {
+                    $bracketCount--;
+
+                    if (
+                        $intermediate > 0 &&
+                        0 === $bracketCount
+                    ) {
+                        $numberMatches++;
+                        $variable  = null;
+                        $regexp    = null;
+                        $item      = (string) substr(
+                            $pattern,
+                            $marker,
+                            $cursor - $marker
+                        );
+                        $itemArray = str_split($item);
+                        foreach ($itemArray as $cursorVar => $ch) {
+                            if ('\0' === $ch) {
+                                break;
+                            }
+
+                            if (
+                                0 === $cursorVar &&
+                                !(
+                                    ($ch >= 'a' && $ch <= 'z') ||
+                                    ($ch >= 'A' && $ch <= 'Z')
+                                )
+                            ) {
+                                $notValid = true;
+
+                                break;
+                            }
+
+                            if (
+                                ($ch >= 'a' && $ch <= 'z') ||
+                                ($ch >= 'A' && $ch <= 'Z') ||
+                                ($ch >= '0' && $ch <= '9') ||
+                                $ch == '-' ||
+                                $ch == '_' ||
+                                $ch == ':'
+                            ) {
+                                if (':' === $ch) {
+                                    $variable = (string) mb_substr(
+                                        $item,
+                                        0,
+                                        $cursorVar
+                                    );
+                                    $regexp   = (string) mb_substr(
+                                        $item,
+                                        $cursorVar + 1
+                                    );
+
+                                    break;
+                                }
+                            } else {
+                                $notValid = true;
+
+                                break;
+                            }
+                        }
+
+                        if (true !== $notValid) {
+                            $tmp = $numberMatches;
+
+                            if (null !== $variable && null !== $regexp) {
+                                $foundPattern = 0;
+                                $regExprArray = str_split($regexp);
+                                foreach ($regExprArray as $ch) {
+                                    if ('\0' === $ch) {
+                                        break;
+                                    }
+
+                                    if (true !== $foundPattern) {
+                                        if ('(' === $ch) {
+                                            $foundPattern = 1;
+                                        }
+                                    } else {
+                                        if (')' === $ch) {
+                                            $foundPattern = 2;
+
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if (2 !== $foundPattern) {
+                                    $route .= '(' . $regexp . ')';
+                                } else {
+                                    $route .= $regexp;
+                                }
+
+                                $matches[$variable] = $tmp;
+                            } else {
+                                $route          .= '([^' . $this->delimiter . ']*)';
+                                $matches[$item] = $tmp;
+                            }
+                        } else {
+                            $route .= '{' . $item . '}';
+                        }
+
+                        continue;
+                    }
+                }
+            }
+
+            if (0 === $bracketCount) {
+                if ('(' === $character) {
+                    $parenthesesCount++;
+                } elseif (')' === $character) {
+                    $parenthesesCount--;
+
+                    if (0 === $parenthesesCount) {
+                        $numberMatches++;
+                    }
+                }
+            }
+
+            if ($bracketCount > 0) {
+                $intermediate++;
+            } else {
+                $route .= $character;
+            }
+        }
+
+        return [$route, $matches];
     }
 
     /**
@@ -470,134 +470,130 @@ class Route implements RouteInterface
      */
     public function reConfigure(string $pattern, $paths = null): void
     {
-//        var moduleName, taskName, actionName, parts, routePaths, realClassName,
-//            namespaceName, pcrePattern, compiledPattern, extracted;
-//
-//        if paths === null {
-//            let paths = [];
-//        }
-//
-//        if typeof paths == "string" {
-//            let moduleName = null,
-//                taskName = null,
-//                actionName = null;
-//
-//            // Explode the short paths using the :: separator
-//            let parts = explode("::", paths);
-//
-//            // Create the array paths dynamically
-//            switch count(parts) {
-//
-//                case 3:
-//                    let moduleName = parts[0],
-//                        taskName   = parts[1],
-//                        actionName = parts[2];
-//                    break;
-//
-//                case 2:
-//                    let taskName   = parts[0],
-//                        actionName = parts[1];
-//                    break;
-//
-//                case 1:
-//                    let taskName = parts[0];
-//                    break;
-//            }
-//
-//            let routePaths = [];
-//
-//            // Process module name
-//            if moduleName !== null {
-//                let routePaths["module"] = moduleName;
-//            }
-//
-//            // Process task name
-//            if taskName !== null {
-//                // Check if we need to obtain the namespace
-//                if memstr(taskName, "\\") {
-//                    // Extract the real class name from the namespaced class
-//                    let realClassName = get_class_ns(taskName);
-//
-//                    // Extract the namespace from the namespaced class
-//                    let namespaceName = get_ns_class(taskName);
-//
-//                    if unlikely (namespaceName === null || realClassName === null) {
-//                        throw new Exception(
-//                            "The route contains invalid paths"
-//                        );
-//                    }
-//
-//                    // Update the namespace
-//                    if namespaceName {
-//                        let routePaths["namespace"] = namespaceName;
-//                    }
-//                } else {
-//                    let realClassName = taskName;
-//                }
-//
-//                // Always pass the task to lowercase
-//                let routePaths["task"] = uncamelize(realClassName);
-//            }
-//
-//            // Process action name
-//            if actionName !== null {
-//                let routePaths["action"] = actionName;
-//            }
-//        } else {
-//            let routePaths = paths;
-//        }
-//
-//        if unlikely typeof routePaths !== "array" {
-//            throw new Exception("The route contains invalid paths");
-//        }
-//
-//        /**
-//         * If the route starts with '#' we assume that it is a regular
-//         * expression
-//         */
-//        if !starts_with(pattern, "#") {
-//            if memstr(pattern, "{") {
-//                /**
-//                 * The route has named parameters so we need to extract them
-//                 */
-//                let extracted = this->extractNamedParams(pattern),
-//                    pcrePattern = extracted[0],
-//                    routePaths = array_merge(routePaths, extracted[1]);
-//            } else {
-//                let pcrePattern = pattern;
-//            }
-//
-//            /**
-//             * Transform the route's pattern to a regular expression
-//             */
-//            let compiledPattern = this->compilePattern(pcrePattern);
-//        } else {
-//            // Replace the delimiter part
-//            if memstr(pattern, ":delimiter") {
-//                let pattern = str_replace(
-//                    ":delimiter",
-//                    this->delimiter,
-//                    pattern
-//                );
-//            }
-//
-//            let compiledPattern = pattern;
-//        }
-//
-//        /**
-//         * Update the original pattern
-//         */
-//        let this->pattern = pattern;
-//
-//        /**
-//         * Update the compiled pattern
-//         */
-//        let this->compiledPattern = compiledPattern;
-//
-//        /**
-//         * Update the route's paths
-//         */
-//        let this->paths = routePaths;
+        if (null === $paths) {
+            $paths = [];
+        }
+
+        if (true === is_string($paths)) {
+            $moduleName = null;
+            $taskName   = null;
+            $actionName = null;
+
+            // Explode the short paths using the :: separator
+            $parts = explode('::', $paths);
+
+            // Create the array paths dynamically
+            switch (count($parts)) {
+                case 3:
+                    $moduleName = $parts[0];
+                    $taskName   = $parts[1];
+                    $actionName = $parts[2];
+                    break;
+
+                case 2:
+                    $taskName   = $parts[0];
+                    $actionName = $parts[1];
+                    break;
+
+                case 1:
+                    $taskName = $parts[0];
+                    break;
+            }
+
+            $routePaths = [];
+
+            // Process module name
+            if (null !== $moduleName) {
+                $routePaths['module'] = $moduleName;
+            }
+
+            // Process task name
+            if (null !== $taskName) {
+                // Check if we need to obtain the namespace
+                if (false !== mb_strpos($pattern, "\\")) {
+                    // Extract the real class name from the namespaced class
+                    $realClassName = get_class_ns(taskName);
+
+                    // Extract the namespace from the namespaced class
+                    $namespaceName = get_ns_class(taskName);
+
+                    if (null === $namespaceName || null === $realClassName) {
+                        throw new Exception(
+                            'The route contains invalid paths'
+                        );
+                    }
+
+                    // Update the namespace
+                    if ($namespaceName) {
+                        $routePaths['namespace'] = $namespaceName;
+                    }
+                } else {
+                    $realClassName = $taskName;
+                }
+
+                // Always pass the task to lowercase
+                $routePaths['task'] = uncamelize($realClassName);
+            }
+
+            // Process action name
+            if (null !== $actionName) {
+                $routePaths['action'] = $actionName;
+            }
+        } else {
+            $routePaths = $paths;
+        }
+
+        if (true !== is_array($paths)) {
+            throw new Exception('The route contains invalid paths');
+        }
+
+        /**
+         * If the route starts with '#' we assume that it is a regular
+         * expression
+         */
+        if (true !== $this->toStartsWith($pattern, '#')) {
+            if (false !== mb_strpos($pattern, '{:delimiter}')) {
+                /**
+                 * The route has named parameters so we need to extract them
+                 */
+                $extracted   = $this->extractNamedParams($pattern);
+                $pcrePattern = $extracted[0];
+                $routePaths  = array_merge($routePaths, $extracted[1]);
+            } else {
+                $pcrePattern = $pattern;
+            }
+
+            /**
+             * Transform the route's pattern to a regular expression
+             */
+            $compiledPattern = $this->compilePattern($pcrePattern);
+        } else {
+            // Replace the delimiter part
+            if (false !== mb_strpos($pattern, ':delimiter')) {
+                $pattern = str_replace(
+                    ':delimiter',
+                    $this->delimiter,
+                    $pattern
+                );
+            }
+
+            $compiledPattern = $pattern;
+        }
+
+        /**
+         * Update the original pattern
+         */
+        $this->pattern = $pattern;
+
+        /**
+         * Update the compiled pattern
+         */
+        $this->compiledPattern = $compiledPattern;
+
+        /**
+         * Update the route's paths
+         */
+        $this->paths = $routePaths;
     }
 
     /**

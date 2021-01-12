@@ -41,67 +41,75 @@ use Phalcon\Cli\Router\RouteInterface;
  */
 class Router extends AbstractInjectionAware
 {
-    protected action;
+    protected $action;
 
-    protected defaultAction = null;
+    protected $defaultAction = null;
 
-    protected defaultModule = null;
-
-    /**
-     * @var array
-     */
-    protected defaultParams = [];
-
-    protected defaultTask = null;
-
-    protected matchedRoute;
-
-    protected matches;
-
-    protected module;
+    protected $defaultModule = null;
 
     /**
      * @var array
      */
-    protected params = [];
+    protected array $defaultParams = [];
 
-    protected routes;
+    protected $defaultTask = null;
 
-    protected task;
+    protected $matchedRoute;
 
-    protected wasMatched = false;
+    protected $matches;
 
     /**
-     * Phalcon\Cli\Router constructor
+     * @var string
      */
-    public function __construct(bool defaultRoutes = true)
+    protected string $module = '';
+
+    /**
+     * @var array
+     */
+    protected array $params = [];
+
+    /**
+     * @var array
+     */
+    protected array $routes = [];
+
+    /**
+     * @var string
+     */
+    protected string $task = '';
+
+    /**
+     * @var bool
+     */
+    protected bool $wasMatched = false;
+
+    /**
+     * Router constructor.
+     *
+     * @param bool $defaultRoutes
+     */
+    public function __construct(bool $defaultRoutes = true)
     {
-        array routes;
-
-        let routes = [];
-
-        if defaultRoutes {
+        if (true === $defaultRoutes) {
             // Two routes are added by default to match
             // /:task/:action and /:task/:action/:params
 
-            let routes[] = new Route(
+            $this->routes[] = new Route(
                 "#^(?::delimiter)?([a-zA-Z0-9\\_\\-]+)[:delimiter]{0,1}$#",
                 [
-                    "task": 1
+                    'task' => 1
                 ]
             );
 
-            let routes[] = new Route(
+            $this->routes[] = new Route(
                 "#^(?::delimiter)?([a-zA-Z0-9\\_\\-]+):delimiter([a-zA-Z0-9\\.\\_]+)(:delimiter.*)*$#",
                 [
-                    "task":   1,
-                    "action": 2,
-                    "params": 3
+                    'task'   => 1,
+                    'action' => 2,
+                    'params' => 3,
                 ]
             );
         }
-
-        let this->routes = routes;
     }
 
     /**
@@ -111,70 +119,81 @@ class Router extends AbstractInjectionAware
      * $router->add("/about", "About::main");
      *```
      *
-     * @param string|array paths
+     * @param string       $pattern
+     * @param string|array $paths
+     *
+     * @return RouteInterface
      */
-    public function add(string! pattern, paths = null) -> <RouteInterface>
+    public function add(string $pattern, $paths = null): RouteInterface
     {
-        var route;
+        $route = new Route($pattern, $paths);
+        $this->routes[] = $route;
 
-        let route = new Route(pattern, paths),
-            this->routes[] = route;
-
-        return route;
+        return $route;
     }
 
     /**
      * Returns processed action name
+     *
+     * @return string
      */
-    public function getActionName() -> string
+    public function getActionName(): string
     {
-        return this->action;
+        return $this->action;
     }
 
     /**
      * Returns the route that matches the handled URI
+     *
+     * @return RouteInterface
      */
-    public function getMatchedRoute() -> <RouteInterface>
+    public function getMatchedRoute(): RouteInterface
     {
-        return this->matchedRoute;
+        return $this->matchedRoute;
     }
 
     /**
      * Returns the sub expressions in the regular expression matched
+     *
+     * @return array
      */
-    public function getMatches() -> array
+    public function getMatches(): array
     {
-        return this->matches;
+        return $this->matches;
     }
 
     /**
      * Returns processed module name
+     *
+     * @return string
      */
-    public function getModuleName() -> string
+    public function getModuleName(): string
     {
-        return this->module;
+        return $this->module;
     }
 
     /**
      * Returns processed extra params
+     *
+     * @return array
      */
-    public function getParams() -> array
+    public function getParams(): array
     {
-        return this->params;
+        return $this->params;
     }
 
     /**
      * Returns a route object by its id
      *
-     * @param int id
+     * @param int $routeId
+     *
+     * @return RouteInterface|bool
      */
-    public function getRouteById(var id) -> <RouteInterface> | bool
+    public function getRouteById(int $routeId)
     {
-        var route;
-
-        for route in this->routes {
-            if route->getRouteId() == id {
-                return route;
+        foreach ($this->routes as $route) {
+            if ($routeId === $route->getRouteId()) {
+                return $route;
             }
         }
 
@@ -183,14 +202,16 @@ class Router extends AbstractInjectionAware
 
     /**
      * Returns a route object by its name
+     *
+     * @param string $name
+     *
+     * @return RouteInterface|bool
      */
-    public function getRouteByName(string! name) -> <RouteInterface> | bool
+    public function getRouteByName(string $name)
     {
-        var route;
-
-        for route in this->routes {
-            if route->getName() == name {
-                return route;
+        foreach ($this->routes as $route) {
+            if ($name === $route->getName()) {
+                return $route;
             }
         }
 
@@ -199,18 +220,22 @@ class Router extends AbstractInjectionAware
 
     /**
      * Returns all the routes defined in the router
+     *
+     * @return array
      */
-    public function getRoutes() -> <Route[]>
+    public function getRoutes(): array
     {
-        return this->routes;
+        return $this->routes;
     }
 
     /**
      * Returns processed task name
+     *
+     * @return string
      */
-    public function getTaskName() -> string
+    public function getTaskName(): string
     {
-        return this->task;
+        return $this->task;
     }
 
     /**
@@ -218,223 +243,235 @@ class Router extends AbstractInjectionAware
      *
      * @param array arguments
      */
-    public function handle(arguments = null)
+    public function handle(array $arguments = null)
     {
-        var moduleName, taskName, actionName, params, route, parts, pattern,
-            routeFound, matches, paths, beforeMatch, converters, converter,
-            part, position, matchPosition, strParams;
-
-        let routeFound = false,
-            parts = [],
-            params = [],
-            matches = null,
-            this->wasMatched = false,
-            this->matchedRoute = null;
-
-        if typeof arguments != "array" {
-            if unlikely (typeof arguments != "string" && arguments !== null) {
-                throw new Exception("Arguments must be an array or string");
-            }
-
-            for route in reverse this->routes {
-                /**
-                 * If the route has parentheses use preg_match
-                 */
-                let pattern = route->getCompiledPattern();
-
-                if memstr(pattern, "^") {
-                    let routeFound = preg_match(pattern, arguments, matches);
-                } else {
-                    let routeFound = pattern == arguments;
-                }
-
-                /**
-                 * Check for beforeMatch conditions
-                 */
-                if routeFound {
-                    let beforeMatch = route->getBeforeMatch();
-
-                    if beforeMatch !== null {
-                        /**
-                         * Check first if the callback is callable
-                         */
-                        if unlikely !is_callable(beforeMatch) {
-                            throw new Exception(
-                                "Before-Match callback is not callable in matched route"
-                            );
-                        }
-
-                        /**
-                         * Check first if the callback is callable
-                         */
-                        let routeFound = call_user_func_array(
-                            beforeMatch,
-                            [
-                                arguments,
-                                route,
-                                this
-                            ]
-                        );
-                    }
-                }
-
-                if routeFound {
-                    /**
-                     * Start from the default paths
-                     */
-                    let paths = route->getPaths(),
-                        parts = paths;
-
-                    /**
-                     * Check if the matches has variables
-                     */
-                    if typeof matches == "array" {
-                        /**
-                         * Get the route converters if any
-                         */
-                        let converters = route->getConverters();
-
-                        for part, position in paths {
-                            if fetch matchPosition, matches[position] {
-                                /**
-                                 * Check if the part has a converter
-                                 */
-                                if fetch converter, converters[part] {
-                                    let parts[part] = call_user_func_array(
-                                        converter,
-                                        [matchPosition]
-                                    );
-                                } else {
-                                    /**
-                                     * Update the parts if there is no converter
-                                     */
-                                    let parts[part] = matchPosition;
-                                }
-                            } else {
-                                /**
-                                 * Apply the converters anyway
-                                 */
-                                if fetch converter, converters[part] {
-                                    let parts[part] = call_user_func_array(
-                                        converter,
-                                        [position]
-                                    );
-                                }
-                            }
-                        }
-
-                        /**
-                         * Update the matches generated by preg_match
-                         */
-                        let this->matches = matches;
-                    }
-
-                    let this->matchedRoute = route;
-
-                    break;
-                }
-            }
-
-            /**
-             * Update the wasMatched property indicating if the route was
-             * matched
-             */
-            if routeFound {
-                let this->wasMatched = true;
-            } else {
-                let this->wasMatched = false;
-
-                /**
-                 * The route wasn't found, try to use the not-found paths
-                 */
-                let this->module = this->defaultModule,
-                    this->task = this->defaultTask,
-                    this->action = this->defaultAction,
-                    this->params = this->defaultParams;
-
-                return this;
-            }
-        } else {
-            let parts = arguments;
-        }
-
-        let moduleName = null,
-            taskName = null,
-            actionName = null;
-
-        /**
-         * Check for a module
-         */
-        if fetch moduleName, parts["module"] {
-            unset parts["module"];
-        } else {
-            let moduleName = this->defaultModule;
-        }
-
-        /**
-         * Check for a task
-         */
-        if fetch taskName, parts["task"] {
-            unset parts["task"];
-        } else {
-            let taskName = this->defaultTask;
-        }
-
-        /**
-         * Check for an action
-         */
-        if fetch actionName, parts["action"] {
-            unset parts["action"];
-        } else {
-            let actionName = this->defaultAction;
-        }
-
-        /**
-         * Check for an parameters
-         */
-        if fetch params, parts["params"] {
-            if typeof params != "array" {
-                let strParams = substr(
-                    (string) params,
-                    1
-                );
-
-                if strParams {
-                    let params = explode(Route::getDelimiter(), strParams);
-                } else {
-                    let params = [];
-                }
-            }
-
-            unset parts["params"];
-        }
-
-        if count(params) {
-            let params = array_merge(params, parts);
-        } else {
-            let params = parts;
-        }
-
-        let this->module = moduleName,
-            this->task = taskName,
-            this->action = actionName,
-            this->params = params;
+//        var moduleName, taskName, actionName, params, route, parts, pattern,
+//            routeFound, matches, paths, beforeMatch, converters, converter,
+//            part, position, matchPosition, strParams;
+//
+//        let routeFound = false,
+//            parts = [],
+//            params = [],
+//            matches = null,
+//            this->wasMatched = false,
+//            this->matchedRoute = null;
+//
+//        if typeof arguments != "array" {
+//            if unlikely (typeof arguments != "string" && arguments !== null) {
+//                throw new Exception("Arguments must be an array or string");
+//            }
+//
+//            for route in reverse this->routes {
+//                /**
+//                 * If the route has parentheses use preg_match
+//                 */
+//                let pattern = route->getCompiledPattern();
+//
+//                if memstr(pattern, "^") {
+//                    let routeFound = preg_match(pattern, arguments, matches);
+//                } else {
+//                    let routeFound = pattern == arguments;
+//                }
+//
+//                /**
+//                 * Check for beforeMatch conditions
+//                 */
+//                if routeFound {
+//                    let beforeMatch = route->getBeforeMatch();
+//
+//                    if beforeMatch !== null {
+//                        /**
+//                         * Check first if the callback is callable
+//                         */
+//                        if unlikely !is_callable(beforeMatch) {
+//                            throw new Exception(
+//                                "Before-Match callback is not callable in matched route"
+//                            );
+//                        }
+//
+//                        /**
+//                         * Check first if the callback is callable
+//                         */
+//                        let routeFound = call_user_func_array(
+//                            beforeMatch,
+//                            [
+//                                arguments,
+//                                route,
+//                                this
+//                            ]
+//                        );
+//                    }
+//                }
+//
+//                if routeFound {
+//                    /**
+//                     * Start from the default paths
+//                     */
+//                    let paths = route->getPaths(),
+//                        parts = paths;
+//
+//                    /**
+//                     * Check if the matches has variables
+//                     */
+//                    if typeof matches == "array" {
+//                        /**
+//                         * Get the route converters if any
+//                         */
+//                        let converters = route->getConverters();
+//
+//                        for part, position in paths {
+//                            if fetch matchPosition, matches[position] {
+//                                /**
+//                                 * Check if the part has a converter
+//                                 */
+//                                if fetch converter, converters[part] {
+//                                    let parts[part] = call_user_func_array(
+//                                        converter,
+//                                        [matchPosition]
+//                                    );
+//                                } else {
+//                                    /**
+//                                     * Update the parts if there is no converter
+//                                     */
+//                                    let parts[part] = matchPosition;
+//                                }
+//                            } else {
+//                                /**
+//                                 * Apply the converters anyway
+//                                 */
+//                                if fetch converter, converters[part] {
+//                                    let parts[part] = call_user_func_array(
+//                                        converter,
+//                                        [position]
+//                                    );
+//                                }
+//                            }
+//                        }
+//
+//                        /**
+//                         * Update the matches generated by preg_match
+//                         */
+//                        let this->matches = matches;
+//                    }
+//
+//                    let this->matchedRoute = route;
+//
+//                    break;
+//                }
+//            }
+//
+//            /**
+//             * Update the wasMatched property indicating if the route was
+//             * matched
+//             */
+//            if routeFound {
+//                let this->wasMatched = true;
+//            } else {
+//                let this->wasMatched = false;
+//
+//                /**
+//                 * The route wasn't found, try to use the not-found paths
+//                 */
+//                let this->module = this->defaultModule,
+//                    this->task = this->defaultTask,
+//                    this->action = this->defaultAction,
+//                    this->params = this->defaultParams;
+//
+//                return this;
+//            }
+//        } else {
+//            let parts = arguments;
+//        }
+//
+//        let moduleName = null,
+//            taskName = null,
+//            actionName = null;
+//
+//        /**
+//         * Check for a module
+//         */
+//        if fetch moduleName, parts["module"] {
+//            unset parts["module"];
+//        } else {
+//            let moduleName = this->defaultModule;
+//        }
+//
+//        /**
+//         * Check for a task
+//         */
+//        if fetch taskName, parts["task"] {
+//            unset parts["task"];
+//        } else {
+//            let taskName = this->defaultTask;
+//        }
+//
+//        /**
+//         * Check for an action
+//         */
+//        if fetch actionName, parts["action"] {
+//            unset parts["action"];
+//        } else {
+//            let actionName = this->defaultAction;
+//        }
+//
+//        /**
+//         * Check for an parameters
+//         */
+//        if fetch params, parts["params"] {
+//            if typeof params != "array" {
+//                let strParams = substr(
+//                    (string) params,
+//                    1
+//                );
+//
+//                if strParams {
+//                    let params = explode(Route::getDelimiter(), strParams);
+//                } else {
+//                    let params = [];
+//                }
+//            }
+//
+//            unset parts["params"];
+//        }
+//
+//        if count(params) {
+//            let params = array_merge(params, parts);
+//        } else {
+//            let params = parts;
+//        }
+//
+//        $this->module = $moduleName;
+//        $this->task = $taskName;
+//        $this->action = $actionName;
+//        $this->params = $params;
     }
 
     /**
      * Sets the default action name
+     *
+     * @param string $actionName
+     *
+     * @return Router
      */
-    public function setDefaultAction(string actionName)
+    public function setDefaultAction(string $actionName): Router
     {
-        let this->defaultAction = actionName;
+        $this->defaultAction = $actionName;
+
+        return $this;
     }
 
     /**
      * Sets the name of the default module
+     *
+     * @param string $moduleName
+     *
+     * @return Router
      */
-    public function setDefaultModule(string moduleName)
+    public function setDefaultModule(string $moduleName): Router
     {
-        let this->defaultModule = moduleName;
+        $this->defaultModule = $moduleName;
+
+        return $this;
     }
 
     /**
@@ -450,47 +487,39 @@ class Router extends AbstractInjectionAware
      *     ]
      * );
      *```
+     *
+     * @param array $defaults
+     *
+     * @return Router
      */
-    public function setDefaults(array! defaults) -> <Router>
+    public function setDefaults(array $defaults): Router
     {
-        var module, task, action, params;
-
         // Set a default module
-        if fetch module, defaults["module"] {
-            let this->defaultModule = module;
-        }
+        $this->defaultModule = $defaults['module'] ?? null;
+        $this->defaultTask   = $defaults['task'] ?? null;
+        $this->defaultAction = $defaults['action'] ?? null;
+        $this->defaultParams = $defaults['params'] ?? [];
 
-        // Set a default task
-        if fetch task, defaults["task"] {
-            let this->defaultTask = task;
-        }
-
-        // Set a default action
-        if fetch action, defaults["action"] {
-            let this->defaultAction = action;
-        }
-
-        // Set default parameters
-        if fetch params, defaults["params"] {
-            let this->defaultParams = params;
-        }
-
-        return this;
+        return $this;
     }
 
     /**
      * Sets the default controller name
+     *
+     * @param string $taskName
      */
-    public function setDefaultTask(string taskName) -> void
+    public function setDefaultTask(string $taskName): void
     {
-        let this->defaultTask = taskName;
+        $this->defaultTask = $taskName;
     }
 
     /**
      * Checks if the router matches any of the defined routes
+     *
+     * @return bool
      */
-    public function wasMatched() -> bool
+    public function wasMatched(): bool
     {
-        return this->wasMatched;
+        return $this->wasMatched;
     }
 }

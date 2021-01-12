@@ -13,10 +13,13 @@ declare(strict_types=1);
 
 namespace Phalcon\Cli;
 
+use Exception as BaseException;
 use Phalcon\Cli\Dispatcher\Exception;
-use Phalcon\Dispatcher\AbstractDispatcher as CliDispatcher;
-use Phalcon\Events\ManagerInterface;
-use Phalcon\Filter\FilterInterface;
+use Phalcon\Dispatcher\AbstractDispatcher;
+
+use function array_merge;
+use function array_values;
+use function call_user_func_array;
 
 /**
  * Dispatching is the process of taking the command-line arguments, extracting
@@ -39,61 +42,66 @@ use Phalcon\Filter\FilterInterface;
  *
  * $handle = $dispatcher->dispatch();
  * ```
+ *
+ * @property string $defaultHandler
+ * @property string $defaultAction
+ * @property string $handlerSuffix
+ * @property array  $options
  */
-class Dispatcher extends CliDispatcher implements DispatcherInterface
+class Dispatcher extends AbstractDispatcher implements DispatcherInterface
 {
     /**
      * @var string
      */
-    protected defaultHandler = "main";
+    protected string $defaultHandler = 'main';
 
     /**
      * @var string
      */
-    protected defaultAction = "main";
+    protected string $defaultAction = 'main';
 
     /**
      * @var string
      */
-    protected handlerSuffix = "Task";
+    protected string $handlerSuffix = 'Task';
 
     /**
      * @var array
      */
-    protected options = [];
+    protected array $options = [];
 
     /**
      * Calls the action method.
      */
-    public function callActionMethod(handler, string actionMethod, array! params = []) -> var
-    {
-        var params;
-
+    public function callActionMethod(
+        $handler, 
+        string $actionMethod, 
+        array $params = []
+    ) {
         // This is to make sure that the parameters are zero-indexed and
-        // their order isn't overriden by any options when we merge the array.
-        let params = array_values(params);
-        let params = array_merge(params, this->options);
+        // their order isn't overridden by any options when we merge the array.
+        $parameters = array_values($params);
+        $parameters = array_merge($parameters, $this->options);
 
-        return call_user_func_array(
-            [handler, actionMethod],
-            params
-        );
+        return call_user_func_array([$handler, $actionMethod], $parameters);
     }
 
     /**
      * Returns the active task in the dispatcher
+     *
+     * @return TaskInterface
      */
-    public function getActiveTask() -> <TaskInterface>
+    public function getActiveTask(): TaskInterface
     {
-        return this->activeHandler;
+        return $this->activeHandler;
     }
 
     /**
      * Returns the latest dispatched controller
      */
-    public function getLastTask() -> <TaskInterface>
+    public function getLastTask(): TaskInterface
     {
-        return this->lastHandler;
+        return $this->lastHandler;
     }
 
     /**
@@ -103,127 +111,154 @@ class Dispatcher extends CliDispatcher implements DispatcherInterface
      * @param  string|array $filters
      * @param  mixed $defaultValue
      */
-    public function getOption(option, filters = null, defaultValue = null) -> var
+    public function getOption($option, $filters = null, $defaultValue = null)
     {
-        var options, filter, optionValue, container;
-
-        let options = this->options;
-
-        if !fetch optionValue, options[option] {
-            return defaultValue;
+        if (true !== isset($this->options[$option])) {
+            return $defaultValue;
         }
 
-        if filters === null {
-            return optionValue;
+        if (null === $filters) {
+            return $this->options[$option];
         }
 
-        let container = this->container;
-
-        if typeof container != "object" {
-            this->{"throwDispatchException"}(
-                Exception::containerServiceNotFound("the 'filter' service"),
+        if (null === $this->container) {
+            $this->throwDispatchException(
+                'filter service',
                 Exception::EXCEPTION_NO_DI
             );
         }
 
-        let filter = <FilterInterface> container->getShared("filter");
+        $filter = $this->container->getShared('filter');
 
-        return filter->sanitize(optionValue, filters);
+        return $filter->sanitize($this->options[$option], $filters);
     }
 
     /**
      * Get dispatched options
+     *
+     * @return array
      */
-    public function getOptions() -> array
+    public function getOptions(): array
     {
-        return this->options;
+        return $this->options;
     }
 
     /**
      * Gets last dispatched task name
+     *
+     * @return string
      */
-    public function getTaskName() -> string
+    public function getTaskName(): string
     {
-        return this->handlerName;
+        return $this->handlerName;
     }
 
     /**
      * Gets the default task suffix
+     *
+     * @return string
      */
-    public function getTaskSuffix() -> string
+    public function getTaskSuffix(): string
     {
-        return this->handlerSuffix;
+        return $this->handlerSuffix;
     }
 
     /**
      * Check if an option exists
+     *
+     * @param mixed $option
+     *
+     * @return bool
      */
-    public function hasOption(var option) -> bool
+    public function hasOption($option): bool
     {
-        return isset this->options[option];
+        return isset($this->options[$option]);
     }
 
     /**
      * Sets the default task name
+     *
+     * @param string $taskName
      */
-    public function setDefaultTask(string taskName) -> void
+    public function setDefaultTask(string $taskName): DispatcherInterface
     {
-        let this->defaultHandler = taskName;
+        $this->defaultHandler = $taskName;
+
+        return $this;
     }
 
     /**
      * Set the options to be dispatched
+     *
+     * @param array $options
+     *
+     * @return $this
      */
-    public function setOptions(array options) -> void
+    public function setOptions(array $options): DispatcherInterface
     {
-        let this->options = options;
+        $this->options = $options;
+
+        return $this;
     }
 
     /**
      * Sets the task name to be dispatched
+     *
+     * @param string $taskName
+     *
+     * @return DispatcherInterface
      */
-    public function setTaskName(string taskName) -> void
+    public function setTaskName(string $taskName): DispatcherInterface
     {
-        let this->handlerName = taskName;
+        $this->handlerName = $taskName;
+
+        return $this;
     }
 
     /**
      * Sets the default task suffix
+     *
+     * @param string $taskSuffix
+     *
+     * @return DispatcherInterface
      */
-    public function setTaskSuffix(string taskSuffix) -> void
+    public function setTaskSuffix(string $taskSuffix): DispatcherInterface
     {
-        let this->handlerSuffix = taskSuffix;
+        $this->handlerSuffix = $taskSuffix;
+
+        return $this;
     }
 
     /**
      * Handles a user exception
+     *
+     * @param \Exception $exception
+     *
+     * @return false
      */
-    protected function handleException(<\Exception> exception)
+    protected function handleException(BaseException $exception)
     {
-        var eventsManager;
-
-        let eventsManager = <ManagerInterface> this->eventsManager;
-
-        if typeof eventsManager == "object" {
-            if eventsManager->fire("dispatch:beforeException", this, exception) === false {
-                return false;
-            }
+        if (false === $this->fireEvent('dispatch:beforeException', $exception)) {
+            return false;
         }
     }
 
     /**
      * Throws an internal exception
+     *
+     * @param string $message
+     * @param int    $exceptionCode
+     *
+     * @return false
      */
-    protected function throwDispatchException(string message, int exceptionCode = 0)
+    protected function throwDispatchException(string $message, int $exceptionCode = 0)
     {
-        var exception;
+        $exception = new Exception($message, $exceptionCode);
 
-        let exception = new Exception(message, exceptionCode);
-
-        if this->handleException(exception) === false {
+        if (false === $this->handleException($exception)) {
             return false;
         }
 
-        throw exception;
+        throw $exception;
     }
 }

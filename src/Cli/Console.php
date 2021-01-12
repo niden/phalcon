@@ -14,8 +14,19 @@ declare(strict_types=1);
 namespace Phalcon\Cli;
 
 use Phalcon\Application\AbstractApplication;
-use Phalcon\Cli\Router\Route;
 use Phalcon\Cli\Console\Exception;
+use Phalcon\Cli\Router\Route;
+use Phalcon\Support\Traits\PhpFileTrait;
+
+use function array_merge;
+use function array_shift;
+use function class_exists;
+use function implode;
+use function is_array;
+use function is_string;
+use function strncmp;
+use function substr;
+use function trim;
 
 /**
  * Class Console
@@ -27,6 +38,8 @@ use Phalcon\Cli\Console\Exception;
  */
 class Console extends AbstractApplication
 {
+    use PhpFileTrait;
+
     /**
      * @var array
      */
@@ -39,19 +52,20 @@ class Console extends AbstractApplication
 
     /**
      * Handle the whole command-line tasks
+     *
+     * @param array $arguments
+     *
+     * @return false
+     * @throws Exception
      */
-    public function handle(array $arguments = null)
+    public function handle(array $arguments = [])
     {
-//        let container = this->container;
-//
-//        if unlikely typeof container != "object" {
-//            throw new Exception(
-//                Exception::containerServiceNotFound("internal services")
-//            );
-//        }
-//
-//        let eventsManager = <ManagerInterface> this->eventsManager;
-//
+        if (null === $this->container) {
+            throw new Exception(
+                'A dependency injection container has not been defined'
+            );
+        }
+
         /**
          * Call boot event, this allows the developer to perform initialization
          * actions
@@ -94,18 +108,18 @@ class Console extends AbstractApplication
             }
 
             $className = $module['className'] ?? 'Module';
+            if (true === isset($module['path'])) {
+                $path = $module['path'];
+                if (true !== $this->phpFileExists($path)) {
+                    throw new Exception(
+                        'Module definition path "' . $path . '" does not exist'
+                    );
+                }
 
-//            if fetch path, module["path"] {
-//                if unlikely !file_exists(path) {
-//                    throw new Exception(
-//                        "Module definition path '" . path . "' doesn't exist"
-//                    );
-//                }
-//
-//                if !class_exists(className, false) {
-//                    require $path;
-//                }
-//            }
+                if (true === class_exists($className, false)) {
+                    require $path;
+                }
+            }
 
             $moduleObject = $this->container->get($className);
             $moduleObject->registerAutoloaders($this->container);
@@ -151,61 +165,56 @@ class Console extends AbstractApplication
         bool $str = true,
         bool $shift = true
     ): Console {
-//        var arg, pos, args, opts, handleArgs;
-//
-//        let args = [],
-//            opts = [],
-//            handleArgs = [];
-//
-//        if shift && count(arguments) {
-//            array_shift(arguments);
-//        }
-//
-//        for arg in arguments {
-//            if typeof arg == "string" {
-//                if strncmp(arg, "--", 2) == 0 {
-//                    let pos = strpos(arg, "=");
-//
-//                    if pos {
-//                        let opts[trim(substr(arg, 2, pos - 2))] = trim(substr(arg, pos + 1));
-//                    } else {
-//                        let opts[trim(substr(arg, 2))] = true;
-//                    }
-//                } else {
-//                    if strncmp(arg, "-", 1) == 0 {
-//                        let opts[substr(arg, 1)] = true;
-//                    } else {
-//                        let args[] = arg;
-//                    }
-//                }
-//            } else {
-//                let args[] = arg;
-//            }
-//        }
-//
-//        if str {
-//            let this->arguments = implode(
-//                Route::getDelimiter(),
-//                args
-//            );
-//        } else {
-//            if count(args) {
-//                let handleArgs["task"] = array_shift(args);
-//            }
-//
-//            if count(args) {
-//                let handleArgs["action"] = array_shift(args);
-//            }
-//
-//            if count(args) {
-//                let handleArgs = array_merge(handleArgs, args);
-//            }
-//
-//            let this->arguments = handleArgs;
-//        }
-//
-//        let this->options = opts;
-//
+        $args       = [];
+        $opts       = [];
+        $handleArgs = [];
+
+        if (true === $shift && true !== empty($arguments)) {
+            array_shift($arguments);
+        }
+
+        foreach ($arguments as $arg) {
+            if (true === is_string($arg)) {
+                if (0 === strncmp($arg, '--', 2)) {
+                    $pos = mb_strpos($arg, '=');
+
+                    if ($pos) {
+                        $opts[trim(substr($arg, 2, $pos - 2))] = trim(substr($arg, $pos + 1));
+                    } else {
+                        $opts[trim(substr($arg, 2))] = true;
+                    }
+                } else {
+                    if (0 === strncmp($arg, '-', 1)) {
+                        $opts[substr($arg, 1)] = true;
+                    } else {
+                        $args[] = $arg;
+                    }
+                }
+            } else {
+                $args[] = $arg;
+            }
+        }
+
+        if (true === $str) {
+            $this->arguments = implode(Route::getDelimiter(), $args);
+        } else {
+            if (true !== empty($args)) {
+                $handleArgs['task'] = array_shift($args);
+            }
+
+            if (true !== empty($args)) {
+                $handleArgs['action'] = array_shift($args);
+            }
+
+            if (true !== empty($args)) {
+                $handleArgs = array_merge($handleArgs, $args);
+            }
+
+            $this->arguments = $handleArgs;
+        }
+
+        $this->options = $opts;
+
         return $this;
     }
 }

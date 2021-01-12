@@ -59,27 +59,35 @@ interface DispatcherInterface extends DispatcherInterfaceBase
      * Sets the default task name
      *
      * @param string $taskName
+     *
+     * @return DispatcherInterface
      */
-    public function setDefaultTask(string $taskName): void;
+    public function setDefaultTask(string $taskName): DispatcherInterface;
 
     /**
      * Set the options to be dispatched
      *
      * @param array $options
+     *
+     * @return DispatcherInterface
      */
-    public function setOptions(array $options): void;
+    public function setOptions(array $options): DispatcherInterface;
 
     /**
      * Sets the task name to be dispatched
      *
      * @param string $taskName
+     *
+     * @return DispatcherInterface
      */
-    public function setTaskName(string $taskName): void;
+    public function setTaskName(string $taskName): DispatcherInterface;
 
     /**
      * Sets the default task suffix
      *
      * @param string $taskSuffix
+     *
+     * @return DispatcherInterface
      */
-    public function setTaskSuffix(string $taskSuffix): void;
+    public function setTaskSuffix(string $taskSuffix): DispatcherInterface;
 }

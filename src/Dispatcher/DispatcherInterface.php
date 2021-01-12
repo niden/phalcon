@@ -96,63 +96,81 @@ interface DispatcherInterface
      * Sets the action name to be dispatched
      *
      * @param string $actionName
+     *
+     * @return DispatcherInterface
      */
-    public function setActionName(string $actionName): void;
+    public function setActionName(string $actionName): DispatcherInterface;
 
     /**
      * Sets the default action suffix
      *
      * @param string $actionSuffix
+     *
+     * @return DispatcherInterface
      */
-    public function setActionSuffix(string $actionSuffix): void;
+    public function setActionSuffix(string $actionSuffix): DispatcherInterface;
 
     /**
      * Sets the default action name
      *
      * @param string $actionName
+     *
+     * @return DispatcherInterface
      */
-    public function setDefaultAction(string $actionName): void;
+    public function setDefaultAction(string $actionName): DispatcherInterface;
 
     /**
      * Sets the default namespace
      *
      * @param string $defaultNamespace
+     *
+     * @return DispatcherInterface
      */
-    public function setDefaultNamespace(string $defaultNamespace): void;
+    public function setDefaultNamespace(string $defaultNamespace): DispatcherInterface;
 
     /**
      * Sets the default suffix for the handler
      *
      * @param string $handlerSuffix
+     *
+     * @return DispatcherInterface
      */
-    public function setHandlerSuffix(string $handlerSuffix): void;
+    public function setHandlerSuffix(string $handlerSuffix): DispatcherInterface;
 
     /**
      * Sets the module name which the application belongs to
      *
      * @param string $moduleName
+     *
+     * @return DispatcherInterface
      */
-    public function setModuleName(string $moduleName): void;
+    public function setModuleName(string $moduleName): DispatcherInterface;
 
     /**
      * Sets the namespace which the controller belongs to
      *
      * @param string $namespaceName
+     *
+     * @return DispatcherInterface
      */
-    public function setNamespaceName(string $namespaceName): void;
+    public function setNamespaceName(string $namespaceName): DispatcherInterface;
 
     /**
      * Set a param by its name or numeric index
      *
      * @param mixed $param
      * @param mixed $value
+     *
+     * @return DispatcherInterface
      */
-    public function setParam($param, $value): void;
+    public function setParam($param, $value): DispatcherInterface;
 
     /**
      * Sets action params to be dispatched
      *
      * @param array $params
+     *
+     * @return DispatcherInterface
      */
-    public function setParams(array $params): void;
+    public function setParams(array $params): DispatcherInterface;
 }

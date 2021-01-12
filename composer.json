@@ -46,6 +46,7 @@
             "Phalcon\\": "src/",
             "Phalcon\\Tests\\Benchmarks\\": "tests/benchmarks/",
             "Phalcon\\Tests\\Fixtures\\": "tests/_data/fixtures/",
+            "Phalcon\\Tests\\Cli\\": "tests/cli/",
             "Phalcon\\Tests\\Integration\\": "tests/integration/",
             "Phalcon\\Tests\\Unit\\": "tests/unit/"
         }

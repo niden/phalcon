@@ -16,7 +16,7 @@ namespace Phalcon\Tests\Cli\Di\FactoryDefault\Cli;
 use CliTester;
 use Phalcon\Di\Exception;
 use Phalcon\Di\FactoryDefault\Cli as Di;
-use Phalcon\Escaper;
+use Phalcon\Html\Escaper;
 
 class OffsetGetCest
 {
@@ -35,7 +35,7 @@ class OffsetGetCest
 
         $I->expectThrowable(
             new Exception(
-                "Service 'non-exists' wasn't found in the dependency injection container"
+                'Service "non-exists" was not found in the dependency injection container'
             ),
             function () use ($di) {
                 $di['non-exists'];
@@ -44,7 +44,7 @@ class OffsetGetCest
 
         $I->expectThrowable(
             new Exception(
-                "Service 'non-exists' wasn't found in the dependency injection container"
+                'Service "non-exists" was not found in the dependency injection container'
             ),
             function () use ($di) {
                 $di->offsetGet('non-exists');

@@ -29,6 +29,6 @@ class HasCest
         $I->wantToTest('Di\FactoryDefault\Cli - has()');
         $di = new Di();
         $I->assertFalse($di->has("nonExisting"));
-        $I->assertTrue($di->has("router"));
+        $I->assertTrue($di->has("escaper"));
     }
 }

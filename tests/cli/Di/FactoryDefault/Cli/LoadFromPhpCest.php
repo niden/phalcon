@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Phalcon\Tests\Cli\Di\FactoryDefault\Cli;
 
 use CliTester;
+use Phalcon\Config\Config;
 use Phalcon\Di\FactoryDefault\Cli as Di;
 
 class LoadFromPhpCest
@@ -34,7 +35,7 @@ class LoadFromPhpCest
         $di->loadFromPhp(dataDir('fixtures/Di/services.php'));
 
         // there are 3 new + 10 from Default
-        $I->assertCount(13, $di->getServices());
+        $I->assertCount(7, $di->getServices());
 
         // check some services
         $actual = $di->get('config');

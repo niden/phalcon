@@ -17,7 +17,7 @@ use CliTester;
 use Phalcon\Di\Exception;
 use Phalcon\Di\FactoryDefault\Cli as Di;
 use Phalcon\Di\Service;
-use Phalcon\Escaper;
+use Phalcon\Html\Escaper;
 
 class GetServiceCest
 {
@@ -48,7 +48,7 @@ class GetServiceCest
         // non exists service
         $I->expectThrowable(
             new Exception(
-                "Service 'non-exists' wasn't found in the dependency injection container"
+                "Service 'non-exists' was not found in the dependency injection container"
             ),
             function () use ($di) {
                 $di->getService('non-exists');

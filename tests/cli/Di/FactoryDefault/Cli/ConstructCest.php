@@ -15,10 +15,11 @@ namespace Phalcon\Tests\Cli\Di\FactoryDefault\Cli;
 
 use CliTester;
 use Codeception\Example;
-use Phalcon\Cli\Dispatcher;
-use Phalcon\Cli\Router;
 use Phalcon\Di\FactoryDefault\Cli;
+use Phalcon\Events\Manager as EventsManager;
+use Phalcon\Filter\Filter;
 use Phalcon\Html\Escaper;
+use Phalcon\Security\Security;
 
 /**
  * Class ConstructCest
@@ -50,53 +51,20 @@ class ConstructCest
     {
         return [
             [
-                'service' => 'annotations',
-                'class'   => \Phalcon\Annotations\Adapter\Memory::class,
-            ],
-
-            [
-                'service' => 'dispatcher',
-                'class'   => Dispatcher::class,
-            ],
-
-            [
                 'service' => 'escaper',
                 'class'   => Escaper::class,
             ],
-
             [
                 'service' => 'eventsManager',
-                'class'   => \Phalcon\Events\Manager::class,
+                'class'   => EventsManager::class,
             ],
-
             [
                 'service' => 'filter',
                 'class'   => Filter::class,
             ],
-
-            [
-                'service' => 'modelsManager',
-                'class'   => \Phalcon\Mvc\Model\Manager::class,
-            ],
-
-            [
-                'service' => 'modelsMetadata',
-                'class'   => Memory::class,
-            ],
-
-            [
-                'service' => 'router',
-                'class'   => Router::class,
-            ],
-
             [
                 'service' => 'security',
                 'class'   => Security::class,
-            ],
-
-            [
-                'service' => 'transactionManager',
-                'class'   => Manager::class,
             ],
         ];
     }
@@ -121,12 +89,8 @@ class ConstructCest
             $params = null;
         }
 
-        $I->assertInstanceOf(
-            $example['class'],
-            $container->get(
-                $example['service'],
-                $params
-            )
-        );
+        $expected = $example['class'];
+        $actual   = $container->get($example['service'], $params);
+        $I->assertInstanceOf($expected, $actual);
     }
 }

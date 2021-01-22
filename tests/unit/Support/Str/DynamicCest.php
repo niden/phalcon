@@ -24,7 +24,7 @@ use UnitTester;
 class DynamicCest
 {
     /**
-     * Tests Phalcon\Text :: dynamic()
+     * Tests Phalcon\Support\Str :: dynamic()
      *
      * @param UnitTester $I
      *
@@ -48,7 +48,7 @@ class DynamicCest
     }
 
     /**
-     * Tests Phalcon\Text :: dynamic() - custom delimiter
+     * Tests Phalcon\Support\Str :: dynamic() - custom delimiter
      *
      * @param UnitTester $I
      *
@@ -71,7 +71,7 @@ class DynamicCest
     }
 
     /**
-     * Tests Phalcon\Text :: dynamic() - custom separator
+     * Tests Phalcon\Support\Str :: dynamic() - custom separator
      *
      * @param UnitTester $I
      *

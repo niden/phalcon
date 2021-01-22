@@ -18,10 +18,13 @@ use Codeception\Example;
 use Phalcon\Cli\Dispatcher;
 use Phalcon\Cli\Router;
 use Phalcon\Di\FactoryDefault\Cli;
-use Phalcon\Escaper;
-use Phalcon\Mvc\Model\MetaData\Memory;
-use Phalcon\Mvc\Model\Transaction\Manager;
+use Phalcon\Html\Escaper;
 
+/**
+ * Class ConstructCest
+ *
+ * @package Phalcon\Tests\Cli\Di\FactoryDefault\Cli
+ */
 class ConstructCest
 {
     /**

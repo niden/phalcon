@@ -15,8 +15,8 @@ namespace Phalcon\Tests\Cli\Cli\Task;
 
 use CliTester;
 use Phalcon\Cli\Task;
+use Phalcon\Collection\Collection;
 use Phalcon\Di\FactoryDefault\Cli as DiFactoryDefault;
-use Phalcon\Registry;
 use Phalcon\Tests\Fixtures\Tasks\EchoTask;
 use Phalcon\Tests\Fixtures\Tasks\MainTask;
 use Phalcon\Tests\Fixtures\Tasks\OnConstructTask;
@@ -45,7 +45,7 @@ class ConstructCest
     {
         $di             = new DiFactoryDefault();
         $di['registry'] = function () {
-            $registry = new Registry();
+            $registry = new Collection();
 
             $registry->data = 'data';
 

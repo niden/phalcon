@@ -25,16 +25,16 @@ use UnitTester;
 class UncamelizeCest
 {
     /**
-     * Tests Phalcon\Text :: uncamelize()
+     * Tests Phalcon\Support\Str :: uncamelize()
      *
      * @dataProvider getSources
      *
      * @author       Phalcon Team <team@phalcon.io>
-     * @since        2018-11-13
+     * @since        2020-09-09
      */
     public function textUncamelize(UnitTester $I, Example $example)
     {
-        $I->wantToTest('Text - uncamelize() - ' . $example[0]);
+        $I->wantToTest('Support\Str - uncamelize() - ' . $example[0]);
 
         $object    = new Uncamelize();
         $value     = $example[0];

@@ -11,20 +11,15 @@
 
 declare(strict_types=1);
 
-namespace Phalcon\Support\Str;
-
-use Phalcon\Support\Str\Traits\UncamelizeTrait;
-use function mb_strtolower;
+namespace Phalcon\Support\Str\Traits;
 
 /**
- * Class Uncamelize
+ * Class UncamelizeTrait
  *
- * @package Phalcon\Support\Str
+ * @package Phalcon\Support\Str\Traits
  */
-class Uncamelize
+trait UncamelizeTrait
 {
-    use UncamelizeTrait;
-
     /**
      * Converts strings to camelize style
      *
@@ -41,8 +36,14 @@ class Uncamelize
      *
      * @return string
      */
-    public function __invoke(string $text, string $delimiter = '_'): string
+    private function toUncamelize(string $text, string $delimiter = '_'): string
     {
-        return $this->toUncamelize($text, $delimiter);
+        return mb_strtolower(
+            preg_replace(
+                '/[A-Z]/',
+                $delimiter . '\\0',
+                lcfirst($text)
+            )
+        );
     }
 }
